@@ -1,9 +1,15 @@
 import React from 'react'
 import useForms from '../../hooks/useForms'
 import { ContainerForm, ContainerSignup, Input } from './styled'
+import axios from 'axios'
+import {BASE_URL} from '../../constants/BASE_URL'
+import { useNavigate } from 'react-router-dom'
+import { irParaFeed } from '../../routes/coordinator'
 
 export default function Signup() {
     const { form, onChange } = useForms({ email: "", senha: "", nomeUsuario: "", confirmaSenha: "" })
+
+    const navigate = useNavigate()
 
     const enviarCadastro = (e) => {
         e.preventDefault()
@@ -16,6 +22,17 @@ export default function Signup() {
                 password: form.senha
             }
             console.log(dadosUsuario)
+
+            axios.post(`${BASE_URL}/users/signup`, dadosUsuario)
+            .then((resp)=>{
+                console.log(resp.data.token)
+                localStorage.setItem('token', resp.data.token)
+                irParaFeed(navigate)
+            })
+            .catch((er)=>{
+                console.log(er.data.token)
+            })
+
         } else {
             alert("Digite a mesma senha nos campos 'senha' e 'confirmação de senha'")
         }
